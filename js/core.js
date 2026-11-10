@@ -1,9 +1,9 @@
 // Núcleo compartilhado: Firebase, relógio do servidor, regras de turno, guilhotina e dívida.
 firebase.initializeApp(FIREBASE_CONFIG);
 const db = firebase.database(), R = db.ref('st'), TS = firebase.database.ServerValue.TIMESTAMP;
-let off = 0, S = {};
+let off = 0, S = {}, loaded = false, pend = false;
 db.ref('.info/serverTimeOffset').on('value', v => off = v.val() || 0);
-R.on('value', v => { S = v.val() || {}; if (window.draw) draw(); });
+R.on('value', v => { loaded = true; S = v.val() || {}; if (window.draw) draw(); });
 
 const now = () => Date.now() + off;                       // hora do servidor
 const $ = q => document.querySelector(q), p2 = n => String(n).padStart(2, '0');
@@ -19,7 +19,7 @@ const hrs = h => { h = h || 0; return Math.floor(h) + 'h' + p2(Math.round(h % 1 
 function wins() {
   const c = cfg(), n = now(), d = dk(n), L = [['m', c.m], ['t', c.t]];
   if ([0, 6].includes(new Date(n).getDay()) && (S.h || 0) > 0) L.push(['d', c.d]);
-  return L.map(([k, [a, b]]) => ({ k, s: at(a), e: at(b), key: d + k }));
+  return L.map(([k, [a, b]]) => { const s = at(a); let e = at(b); if (e <= s) e += 864e5; return { k, s, e, key: d + k }; });   // vira a meia-noite
 }
 const cur = () => wins().find(w => now() < w.e && !(S.done || {})[w.key]);
 // Alarme: ronda estourou (relógio do servidor) e ainda não confirmada.
@@ -36,10 +36,13 @@ function close(s, why) {
 
 // Rodado por TV e celular a cada segundo; as transações impedem duplicidade.
 function check() {
+  if (!loaded) return;
+  // Marca o início do sistema: turnos anteriores a este momento nunca são cobrados.
+  if (S.arm == null) { if (!pend) { pend = true; R.child('arm').set(TS).then(() => pend = false); } return; }
   const n = now(), mo = dk(n).slice(0, 7), x = S.shift;
   if (new Date(n).getDate() === 3 && S.rk !== mo) tx(s => { s.perd = s.h || 0; s.h = 0; s.rk = mo; });   // zera dia 3
   if (x && x.on) { if (n >= x.e) tx(s => s.shift && s.shift.on ? close(s, 'fim') : false); return; }      // guilhotina
-  for (const w of wins()) if (n >= w.e && !(S.done || {})[w.key]) tx(s => {                               // faltou ao turno
+  for (const w of wins()) if (n >= w.e && w.s >= S.arm && !(S.done || {})[w.key]) tx(s => {                               // faltou ao turno
     s.done = s.done || {}; if (s.done[w.key]) return false; s.done[w.key] = 1;
     if (w.k === 'd') s.h = (s.h || 0) * 1.5; else { s.streak = 0; s.h = (s.h || 0) + (w.e - w.s) / 36e5; }
   });

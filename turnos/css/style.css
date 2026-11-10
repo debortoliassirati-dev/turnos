@@ -1,0 +1,21 @@
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+html,body{margin:0;height:100%;background:#000;color:#fff;font-family:"Arial Black",Impact,"Helvetica Neue",sans-serif;font-weight:900}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+#hl{position:absolute;left:-99px;opacity:0;pointer-events:none}
+#app{min-height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:2.5vh;padding:3vh 4vw}
+h1,h2{margin:0;text-transform:uppercase}h1{font-size:11vw}h2{font-size:6vw}
+.big{width:100%;min-height:32vh;border:0;border-radius:28px;font:inherit;font-size:8vw;text-transform:uppercase;color:#000;background:#22c55e;touch-action:manipulation}
+.big small{font-size:.5em}.big.red{background:#ef4444;color:#fff}.big.gray{background:#444;color:#fff;min-height:16vh;font-size:6vw}
+.big:active{transform:scale(.97)}.big:disabled{background:#1c1c1c;color:#555}
+.sm,input{font:inherit;font-size:5vw;min-height:9vh;width:100%;border:2px solid #555;border-radius:16px;background:#111;color:#fff;text-align:center}
+.hold{position:relative;overflow:hidden;touch-action:none}.hold i{position:absolute;inset:0 auto 0 0;width:0;background:#fff;opacity:.55}
+.cf{width:100%;font-size:4vw;text-align:left}.cf fieldset{border:0;padding:0;display:grid;gap:1.5vh}.cf label{display:flex;gap:2vw;align-items:center}.cf input{min-height:7vh;font-size:4.5vw}
+.red{color:#ef4444}.grn{color:#22c55e}.yel{color:#facc15}
+body.tv #app{height:100%;justify-content:space-between;padding:4vmin}
+.clock{font-size:21vmin;line-height:1;letter-spacing:-.02em}.score{font-size:32vmin;line-height:1}
+.bar{width:100%;height:7vmin;background:#222;border-radius:4vmin;overflow:hidden}.bar i{display:block;height:100%;background:#22c55e;transition:width .3s}
+.foot{width:100%;display:flex;justify-content:space-between;align-items:flex-end;font-size:5.5vmin}
+.mid{font-size:7vmin}
+.alarm,.snd{position:fixed;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;text-align:center;padding:6vmin;font-size:10vmin}
+.alarm{animation:st .5s steps(1) infinite}@keyframes st{0%{background:#f00;color:#fff}50%{background:#fff;color:#f00}}
+.snd{background:#facc15;color:#000;z-index:10}.warn{color:#000;background:#facc15;padding:3vmin;border-radius:3vmin;font-size:8vmin}

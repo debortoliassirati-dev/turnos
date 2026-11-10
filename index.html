@@ -1,0 +1,15 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black"><meta name="theme-color" content="#000000">
+<link rel="manifest" href="manifest.json"><title>Turnos</title><link rel="stylesheet" href="css/style.css"></head>
+<body><label id="hl"><input type="checkbox" switch id="hx"></label><main id="app"></main>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="js/config.js"></script><script src="js/core.js"></script>
+<script>
+const mode=new URLSearchParams(location.search).get('mode')==='tv'?'tv':'mobile';
+document.body.className=mode;
+const s=document.createElement('script');s.src='js/'+mode+'.js';document.body.appendChild(s);
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');
+</script></body></html>

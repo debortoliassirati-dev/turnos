@@ -19,7 +19,7 @@ const hrs = h => { h = h || 0; return Math.floor(h) + 'h' + p2(Math.round(h % 1 
 function wins() {
   const c = cfg(), n = now(), d = dk(n), L = [['m', c.m], ['t', c.t]];
   if ([0, 6].includes(new Date(n).getDay()) && (S.h || 0) > 0) L.push(['d', c.d]);
-  return L.map(([k, [a, b]]) => ({ k, s: at(a), e: at(b), key: d + k }));
+  return L.map(([k, [a, b]]) => { const s = at(a); let e = at(b); if (e <= s) e += 864e5; return { k, s, e, key: d + k }; });   // vira a meia-noite
 }
 const cur = () => wins().find(w => now() < w.e && !(S.done || {})[w.key]);
 // Alarme: ronda estourou (relógio do servidor) e ainda não confirmada.

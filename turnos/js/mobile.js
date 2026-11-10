@@ -3,7 +3,7 @@ const A = $('#app'); let tv = 0, hs = 0, raf = 0;
 db.ref('tv').on('value', v => tv = v.val() || 0);
 const hap = () => { try { navigator.vibrate && navigator.vibrate(40); } catch (e) {} $('#hl').click(); };   // iOS 17.4+: switch gera haptic
 const TESTE = new URLSearchParams(location.search).get('teste');
-const up = o => R.update(o), NM = { m: 'MANHÃ', t: 'TARDE', d: 'DÍVIDA' };
+const up = o => R.update(o).catch(e => alert('Erro ao gravar: ' + e.message)), NM = { m: 'MANHÃ', t: 'TARDE', d: 'DÍVIDA' };
 const B = (t, id, c = '', d = false) => `<button class="big ${c}" id="${id}" ${d ? 'disabled' : ''}>${t}</button>`;
 
 function panel(on) {
@@ -62,7 +62,9 @@ function toll() {
 function teste() {   // só com ?teste=1: cria um turno curto (meta 4, ronda 1 min) começando agora
   const d = new Date(now()); d.setSeconds(0, 0); const a = d.getTime();
   const f = t => { const e = new Date(t); return p2(e.getHours()) + ':' + p2(e.getMinutes()); };
-  up({ cfg: { rate: 24, ronda: 1, m: [f(a), f(a + 6e5)], t: [f(a + 12e5), f(a + 18e5)], d: DEF.d }, pending: null, done: null, shift: null });
+  R.update({ cfg: { rate: 24, ronda: 1, m: [f(a), f(a + 6e5)], t: [f(a + 12e5), f(a + 18e5)], d: DEF.d }, pending: null, done: null, shift: null })
+    .then(() => alert('Turno de teste criado! Toque em BATER PONTO — ENTRADA (no alto da tela).'))
+    .catch(e => alert('Erro: ' + e.message));
 }
 function save() {
   const g = i => $('#c_' + i).value, tm = dk(now() + 864e5);

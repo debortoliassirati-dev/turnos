@@ -2,6 +2,7 @@
 const A = $('#app'); let tv = 0, hs = 0, raf = 0;
 db.ref('tv').on('value', v => tv = v.val() || 0);
 const hap = () => { try { navigator.vibrate && navigator.vibrate(40); } catch (e) {} $('#hl').click(); };   // iOS 17.4+: switch gera haptic
+const TESTE = new URLSearchParams(location.search).get('teste');
 const up = o => R.update(o), NM = { m: 'MANHÃ', t: 'TARDE', d: 'DÍVIDA' };
 const B = (t, id, c = '', d = false) => `<button class="big ${c}" id="${id}" ${d ? 'disabled' : ''}>${t}</button>`;
 
@@ -31,7 +32,7 @@ function draw() {
     h = (x && x.t ? `<h2 class="${x.ok ? 'grn' : 'red'}">${x.ok ? 'Turno cumprido' : 'Turno encerrado'}</h2>` : '')
       + (w ? B('Bater ponto — Entrada<br><small>' + NM[w.k] + '</small>', 'pt') : '<h2>Fora de turno</h2>');
   }
-  if (pn) h += panel(on);
+  if (pn) h += panel(on) + (TESTE && !on ? B('TESTE: turno de 10 min agora', 'tt', 'gray') + B('TESTE: zerar tudo', 'tz', 'gray') : '');
   if (A.dataset.v !== h) { A.dataset.v = h; A.innerHTML = h; }
 }
 
@@ -58,6 +59,11 @@ function toll() {
   if (a === 0 && x.ph === 'r') { const g = Math.min(3, 12 - (x.xt || 0)); if (g > 0) { o['shift/xl'] = (x.xl || 0) + g; o['shift/xt'] = (x.xt || 0) + g; } }
   up(o);   // reinicia a ronda no timestamp do servidor e devolve os botões
 }
+function teste() {   // só com ?teste=1: cria um turno curto (meta 4, ronda 1 min) começando agora
+  const d = new Date(now()); d.setSeconds(0, 0); const a = d.getTime();
+  const f = t => { const e = new Date(t); return p2(e.getHours()) + ':' + p2(e.getMinutes()); };
+  up({ cfg: { rate: 24, ronda: 1, m: [f(a), f(a + 6e5)], t: [f(a + 12e5), f(a + 18e5)], d: DEF.d }, pending: null, done: null, shift: null });
+}
 function save() {
   const g = i => $('#c_' + i).value, tm = dk(now() + 864e5);
   up({ cfg: cfg(), pending: { from: tm, cfg: { rate: +g('rate') || 6, ronda: +g('ronda') || 20, m: [g('m0'), g('m1')], t: [g('t0'), g('t1')], d: cfg().d } } });
@@ -67,6 +73,7 @@ A.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b || b.disabled) return; hap(); const x = S.shift || {};
   ({ pt: punch, fu: () => up({ 'shift/f': (x.f || 0) + 1 }), ff: () => up({ 'shift/ph': 'p', 'shift/rb': TS }),
      pp: () => plus(0), px: () => plus(1), ok: toll, sv: save,
+     tt: teste, tz: () => confirm('Apagar tudo?') && R.set(null),
      ex: () => x.c >= x.meta && tx(s => s.shift.on ? close(s, 'saida') : false) })[b.id]?.();
 });
 // Hold-to-Confirm: 4 s ininterruptos; soltar zera a barra. Ao completar, a TV silencia (rc = true) e o celular segue travado no pedágio.
